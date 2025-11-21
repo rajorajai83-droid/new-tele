@@ -1,7 +1,9 @@
 name: Telegram Stock Bot
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"   # runs automatically every 5 minutes
+  workflow_dispatch:        # allows manual run too
 
 jobs:
   run-bot:
