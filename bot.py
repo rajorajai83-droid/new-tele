@@ -42,6 +42,9 @@ def get_sr(df):
 # 📌 SEND SIGNAL MESSAGE
 # ----------------------------
 def send_signal(symbol):
+    # Capture time before generating the chart and signal
+    signal_time = datetime.now().strftime('%I:%M %p')
+
     # Chart Screenshot
     chart_path = get_chart(symbol)
 
@@ -55,17 +58,31 @@ def send_signal(symbol):
     signal = generate_signal(df)
     support, resistance = get_sr(df)
 
+    # Calculate Stop Loss, Profit Target, and Risk-to-Reward Ratio
+    stop_loss = round(support * 1.02, 2)  # 2% below support
+    profit_target = round(resistance * 1.03, 2)  # 3% above resistance
+    risk_to_reward = round((profit_target - stop_loss) / (stop_loss - support), 2)
+
     msg = f"""
 📊 **Auto Stock Signal — {symbol}**
-🕒 {datetime.now().strftime('%I:%M %p')}
+🕒 {signal_time}
 
 **Signal:** {signal}
 
-📉 Support: {support}
-📈 Resistance: {resistance}
+📉 **Support:** {support}
+📈 **Resistance:** {resistance}
+
+🎯 **Risk Management:**
+- **Stop Loss:** ₹{stop_loss} (2% below support)
+- **Target Profit:** ₹{profit_target} (3% above resistance)
+- **Risk-to-Reward Ratio:** {risk_to_reward}
+
+🔒 Always manage risk and trade wisely!
 """
 
+    # Send message with the chart
     with open(chart_path, "rb") as img:
         bot.sendPhoto(chat_id=CHAT_ID, photo=img, caption=msg, parse_mode="Markdown")
 
     print("Signal Sent:", symbol)
+
